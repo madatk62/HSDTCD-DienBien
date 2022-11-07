@@ -3,6 +3,10 @@ import { Modal,Button } from 'react-bootstrap-v5';
 import { Formik, useFormik } from 'formik';
 import * as yup from 'yup';
 import clsx from 'clsx';
+import { Upload } from 'antd';
+import { toast } from 'react-toastify';
+const {Dragger} = Upload
+const maxUploadSize = 3000000;
 var initValue = {
     MaGiayTo: "",
     TenGiayTo: "",
@@ -26,7 +30,7 @@ const GiayToSchema = yup.object().shape({
 })
 const ModalFileCategoryItem = (props: any) =>{
     const [isLoading, setIsLoading] = useState(false);
-
+    const [fileUpload, setFileUpload] = useState([]);
     const handleSubmitForm = ()=>{
       var a = formik.handleSubmit();
     }
@@ -47,6 +51,35 @@ const ModalFileCategoryItem = (props: any) =>{
             setValues(props.data);
         }
     })
+    // init file Upload 
+    const uploads = {
+        onRemove : (file: any) =>{
+            
+            
+        },
+        beforeUpload: (file:any)=> {
+            
+            setFileUpload((tmp:any) : any=>{
+                var totalSize = file.size;
+                tmp.map((item:any)=>{
+                    totalSize += item.size;
+                })
+                console.log(totalSize);
+                if(totalSize >= maxUploadSize) {
+                    toast.warning("Đính kèm vượt quá giới hạn cho phép");
+                    return [...tmp];
+                }
+                formik.setValues((tmp:any):any=>{
+                    return [...tmp];
+                })
+                return [...tmp,file];
+            })
+            
+        },
+        name: 'file',
+        multiple: true,
+        fileList: fileUpload
+    }
     useEffect(()=>{
         formik.setValues(props.data);
     },[])
@@ -120,31 +153,51 @@ const ModalFileCategoryItem = (props: any) =>{
                     </div>    
                 </div>
                 <div className='row fv-row mb-7'>
-                        <div className='col-xl-6 col-lg-6 col-md-6'>
-                            <label className='form-label fw-bolder text-dark fs-6 required'>Tên giấy tờ</label>
-                            <textarea 
-                            placeholder='Tên giấy tờ'
-                            rows={3}
-                            autoComplete = 'off'
-                            {...formik.getFieldProps('TenGiayTo')}
-                            className={clsx('form-control form-control-lg form-control-solid', 
-                                {'is-invalid': formik.touched.TenGiayTo && formik.errors.TenGiayTo},
-                                {
-                                'is-valid': formik.touched.TenGiayTo && !formik.errors.TenGiayTo,
-                                } )}
-
-                            />
+                    <div className='col-xl-6 col-lg-6 col-md-6'>
+                        <label className='form-label fw-bolder text-dark fs-6 required'>Tên giấy tờ</label>
+                        <textarea 
+                        placeholder='Tên giấy tờ'
+                        rows={3}
+                        autoComplete = 'off'
+                        {...formik.getFieldProps('TenGiayTo')}
+                        className={clsx('form-control form-control-lg form-control-solid', 
+                            {'is-invalid': formik.touched.TenGiayTo && formik.errors.TenGiayTo},
                             {
-                            (formik.touched.TenGiayTo && formik.errors.TenGiayTo) &&
-                            <div className='fv-plugins-message-container'>
-                                <div className='fv-help-block'>
-                                <span role='alert' className='text-danger'>{formik.errors.TenGiayTo}</span>
-                                </div>
+                            'is-valid': formik.touched.TenGiayTo && !formik.errors.TenGiayTo,
+                            } )}
+
+                        />
+                        {
+                        (formik.touched.TenGiayTo && formik.errors.TenGiayTo) &&
+                        <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>
+                            <span role='alert' className='text-danger'>{formik.errors.TenGiayTo}</span>
                             </div>
-                            }
                         </div>
-                    
+                        }
                     </div>
+                
+                </div>
+                <div className='row fv-row mb-7'>
+                    <div>  <label className='form-label fw-bolder text-dark fs-6 required'>Đính kèm</label></div>
+                    <div>
+                        <Dragger {...uploads} listType = "picture" >
+                            <div>
+                                <p className='ant-upload-text'>Thả tệp tin hoặc nhấp chuột để tải lên</p>
+                                <p className='ant-upload-hint'>Đính kèm</p>
+                            </div>
+                        </Dragger>
+                    </div>
+                       
+                    {
+                    (formik.touched.UrlFile && formik.errors.UrlFile) &&
+                    <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>
+                        <span role='alert' className='text-danger'>{formik.errors.UrlFile}</span>
+                        </div>
+                    </div>
+                    }   
+                </div>
                     
                
             
@@ -157,9 +210,6 @@ const ModalFileCategoryItem = (props: any) =>{
                   disabled = {formik.isSubmitting || !formik.isValid}
                   hidden = {formik.values.NguonGui=="DVC"?true:false}
                   >
-                    {
-                        console.log(formik.isSubmitting)
-                    }
                    { !isLoading?<span>
                         <i className='fa fa-save'></i>
                         Tạo mới

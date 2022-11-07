@@ -7,6 +7,7 @@ import {ProfileWrapper} from '../pages/profile/ProfileWrapper'
 import { MasterLayout } from '../../_metronic/layout/MasterLayout'
 import { AuthPage } from '../modules/auth'
 import FileCategories from '../pages/categories/FileCategories'
+import GroupFileCategories from '../pages/categories/GroupFileCategories'
 export function PrivateRoutes() {
 
   return (
@@ -18,6 +19,7 @@ export function PrivateRoutes() {
           <Route path='/profile' component={ProfileWrapper} />
           <Route path='/auth' component={AuthPage} />
           <Route path='/categories' component={FileCategories} />
+          <Route path='/group-file' component={GroupFileCategories} />
           <Redirect from='/auth' to='/categories' />
           <Redirect exact from='/' to='/categories' />
           {/* <Redirect to='error/404' /> */}

@@ -43,7 +43,7 @@ const TableFileCategories = (props:any) => {
     ]
     const [dataTable, setDataTable] = useState([{}]);
     const [detailItem, setDetailItem] = useState({})
-    const [modalVisible, setModalVisible] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
     useEffect(()=>{
         getDataCategories();
     },[])
